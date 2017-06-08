@@ -1,99 +1,99 @@
 (ns zaub.cli
   (:require [zaub.core :as zaub]
             [clojure.string :as str])
-  (:import [java.io BufferedReader]
-           [zaub.core Game]))
+  (:import [java.io BufferedReader]))
 
-(def unit-str-map {0 "s"
-               1 "m"})
-
-(def unit-id {"s" zaub.core/soldier
-              "m" zaub.core/mage})
+(defn- parse-int [n]
+  (Integer/parseInt n))
 
 (defn print-help [opts]
   (println (str/join "\n"
-                     (into ["Commands" "--------"]
-                           (map (partial str)
-                                (keys opts)
-                                (repeat " : ")
-                                (vals opts))))))
+                     (into ["Commands"
+                            "--------"]
+                           (map (partial str/join "  ")
+                                (seq opts))))))
 
-(defn unit-str [unit]
-  (if unit
-    (let [s (unit-str-map (:id unit))]
-      (if (:active unit)
-        (str/upper-case s)
-        s))
-    "_"))
-
-(defn coll-str [coll]
-  (str/join " " (map unit-str coll)))
-
-(defn board-row-strs [brd]
-  (map coll-str
-       (zaub/get-rows (zaub/pad-cols brd 5))))
-
-(defn print-board [game]
-  (println (str/join "\n" (board-row-strs (:board game)))))
-
-(defn insert-unit [game col-n-str unit]
-  (assoc game :board (zaub/insert-unit (:board game)
-                                       (Integer/parseInt col-n-str)
-                                       (zaub/make-unit (get unit-id unit)))))
-
-(defn remove-unit [game col-n-str]
-  (assoc game :board (zaub/remove-unit (:board game)
-                                       (Integer/parseInt col-n-str))))
 
 (def opts-map {:help "print help"
-               :unit "insert unit, COL-N UNIT-ID"
-               :remove-unit "remove unit, COL-N"
-               :print-board "print game board"
+               :push-unit "insert unit, COL-N UNIT-ID"
+               :pop-unit "remove unit, COL-N"
+               :print-board "print game-info board"
                :quit "quit"
                :new "new game"})
 
-(defmulti opt (fn [game cmd & args] (keyword cmd)))
+(defn- format-elem [elem]
+  (format "%s" (if (some? elem) elem ".")))
 
-(defmethod opt :default [game cmd & _]
+(defn pad-col [min-size brd]
+  (take min-size (concat brd (repeat nil))))
+
+(defn pad-board [col-size board]
+  (map (partial pad-col col-size) board))
+
+(defn board-str [{:keys [col-size board]}]
+  (str/join "\n" (map (partial str/join " ")
+                      (map (fn [m] (map format-elem m))
+                           (zaub/get-rows (pad-board col-size board))))))
+
+(defmulti handle-cmd (fn [cmd game-info & args] (keyword cmd)))
+
+(defmethod handle-cmd :default [cmd game-info & _]
   (println "Unknown command:" cmd)
   (print-help opts-map)
-  game)
+  game-info)
 
-(defmethod opt :help [game & _]
+(defmethod handle-cmd :help [cmd game-info & _]
   (print-help opts-map)
-  game)
+  game-info)
 
-(defmethod opt :unit [game cmd & args]
-  (let [[col-n-str unit-id-str] args]
-    (insert-unit game col-n-str unit-id-str)))
+(defmethod handle-cmd :push-unit [cmd game-info col-n-str unit-id]
+  (let [col-n (parse-int col-n-str)
+        {board :board} game-info]
+    (assoc game-info
+           :board
+           (zaub/push-into-nth board
+                               col-n
+                               unit-id))))
 
-(defmethod opt :remove-unit [game cmd & args]
-  (let [[col-n-str] args]
-    (remove-unit game col-n-str)))
+(defmethod handle-cmd :pop-unit [cmd game-info col-n-str]
+  (let [col-n (parse-int col-n-str)
+        {board :board} game-info]
+    (assoc game-info
+           :board
+           (zaub/pop-from-nth board
+                              col-n))))
 
-(defmethod opt :print-board [game & _]
-  (print-board game)
-  game)
+(defmethod handle-cmd :print-board [cmd game-info]
+  (println (board-str game-info))
+  game-info)
 
-(defmethod opt :quit [& _]
+(defmethod handle-cmd :quit [_ _]
   nil)
 
-(defmethod opt :new [game & _]
-  (zaub/create-new-game 6 5)
-  game)
+(defmethod handle-cmd :new [cmd game-info]
+  {:board (zaub/create-empty-board 6)
+   :col-size 5})
 
-(defn handle [game line]
-  (when (not (nil? line))
-    (println)
-    (let [game (apply opt game (str/split line #" "))]
-      (println)
-      game)))
+(defn handle [game-info line]
+  (when (some? line)
+    (let [tokens (str/split line #" ")]
+      (apply handle-cmd
+             (first tokens)
+             game-info
+             (rest tokens)))))
 
 (defn -main [& args]
   (println "Welcome to Zaub!")
   (println "Type help to view commands")
-  (loop [game (zaub/create-new-game 6 5)
+  (print "> ")
+  (flush)
+  (loop [game-info {:board (zaub/create-empty-board 6)
+                    :col-size 5}
          lines (line-seq (BufferedReader. *in*))]
-    (when (not (nil? game))
-      (recur (handle game (first lines)) (rest lines))))
-  "Bye")
+    (if (some? game-info)
+      (recur (handle game-info
+                     (first lines))
+             (do (print "> ")
+                 (flush)
+                 (rest lines)))
+      "Bye")))

@@ -2,6 +2,11 @@
   (:require [clojure.test :refer :all]
             [zaub.core :refer :all]))
 
+(def test-brd (create-board-from-cols '((:a :b :c)
+                                        (:d :e :f)
+                                        (:g :h :i)
+                                        (:j :k :l))))
+
 (deftest test-create-empty-board
   (testing "created with correct number of cols"
     (is (let [siz (rand-int 100)]
@@ -28,9 +33,12 @@
 
 (deftest test-get-rows
   (testing "correctly gets rows"
-    (is (= ['(:a :d :g)
-            '(:b :e :h)
-            '(:c :f :i)]
-           (get-rows (create-board-from-cols '((:a :b :c)
-                                               (:d :e :f)
-                                               (:g :h :i))))))))
+    (is (= ['(:a :d :g :j)
+            '(:b :e :h :k)
+            '(:c :f :i :l)]
+           (get-rows test-brd)))))
+
+(deftest test-pop-from-nth
+  (testing "correctly pops from queue"
+    (is (assoc test-brd 2 (pop (nth test-brd 2)))
+        (pop-from-nth test-brd 2))))
