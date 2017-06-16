@@ -2,10 +2,11 @@
   (:require [clojure.test :refer :all]
             [zaub.core :refer :all]))
 
-(def test-brd (create-board-from-cols '((:a :b :c)
-                                        (:d :e :f)
-                                        (:g :h :i)
-                                        (:j :k :l))))
+(def test-brd (create-board-from-cols (map unit-coll
+                                           '(("a" "a" "a" "b" "b")
+                                             ("c" "c" "c" "c")
+                                             ("d" "d")
+                                             ("e" "e" "e" "e" "f" "f" "f" "f")))))
 
 (deftest test-create-empty-board
   (testing "created with correct number of cols"
@@ -42,3 +43,7 @@
   (testing "correctly pops from queue"
     (is (assoc test-brd 2 (pop (nth test-brd 2)))
         (pop-from-nth test-brd 2))))
+
+(deftest test-activate
+  (is (= {:active true}
+         (activate {}))))
