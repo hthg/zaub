@@ -1,6 +1,6 @@
-(ns zaub.cli
-  (:require [zaub.core :refer :all]
-            [zaub.unit :refer :all]
+(ns zaub.cli.sandbox
+  (:require [zaub.core.board :refer :all]
+            [zaub.core.unit :refer :all]
             [clojure.string :as str])
   (:import [java.io BufferedReader]))
 

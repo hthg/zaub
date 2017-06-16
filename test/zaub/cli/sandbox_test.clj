@@ -1,16 +1,16 @@
-(ns zaub.cli-test
+(ns zaub.cli.sandbox-test
   (:require [clojure.test :refer :all]
             [clojure.string :as str]
-            [zaub.core :as zaub]   
-            [zaub.cli :refer :all])) 
+            [zaub.core.board :as zboard]   
+            [zaub.cli.sandbox :refer :all])) 
 
-(def test-brd (zaub/create-board-from-cols '(("a" "b" "c")
+(def test-brd (zboard/create-board-from-cols '(("a" "b" "c")
                                              ("d")
                                              ("e" "f"))))
 (def test-game-info {:board test-brd :col-size 5})
 
 (deftest test-get-rows
-  (zaub/get-rows test-brd))
+  (zboard/get-rows test-brd))
 (deftest test-print-board
   (handle-cmd "print-board" test-game-info))
 (deftest test-pad-board
@@ -20,6 +20,6 @@
 (deftest test-push-unit
   (assoc test-game-info
          :board
-         (zaub/push-into-nth (:board test-game-info)
+         (zboard/push-into-nth (:board test-game-info)
                              5
                              :e)))

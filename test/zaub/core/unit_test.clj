@@ -1,7 +1,7 @@
-(ns zaub.unit-test
+(ns zaub.core.unit-test
   (:require [clojure.test :refer :all]
-            [zaub.core :refer :all]  
-            [zaub.unit :refer :all]))
+            [zaub.core.board :refer :all]  
+            [zaub.core.unit :refer :all]))
 
 (defn- unit-coll [coll]
   (map unit coll))

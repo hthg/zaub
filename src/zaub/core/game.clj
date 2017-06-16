@@ -1,6 +1,6 @@
-(ns zaub.game
-   (:require [zaub.core :as zcore]
-             [zaub.unit :as zunit])) 
+(ns zaub.core.game
+   (:require [zaub.core.board :as zboard]
+             [zaub.core.unit :as zunit])) 
 
 (def attrs '(:board))
 

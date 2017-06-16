@@ -1,6 +1,6 @@
-(ns zaub.core-test
+(ns zaub.core.board-test
   (:require [clojure.test :refer :all]
-            [zaub.core :refer :all]))
+            [zaub.core.board :refer :all]))
 
 (def test-brd (create-board-from-cols (map unit-coll
                                            '(("a" "a" "a" "b" "b")

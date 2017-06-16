@@ -1,5 +1,5 @@
-(ns zaub.unit
-   (:require [zaub.core :as zcore]))
+(ns zaub.core.unit
+   (:require [zaub.core.board :as zboard]))
 
 (def attrs '(:tid :active :ttr :atk))
 

@@ -1,4 +1,4 @@
-(ns zaub.core)
+(ns zaub.core.board)
 
 (def queue (clojure.lang.PersistentQueue/EMPTY))
 
