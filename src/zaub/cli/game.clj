@@ -19,7 +19,8 @@
   (first (random-units unit-types 1)))
 
 (defn- create-randomized-board []
-  (zboard/create-randomized-board 6 (random-units unit-types 4) make-unit))
+  (zboard/create-randomized-board 6(map make-unit
+                                        (random-units unit-types 4))))
 
 (defn- init-game []
   (zgame/game (create-randomized-board) 5 10 (random-unit unit-types)))
