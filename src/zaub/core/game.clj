@@ -2,11 +2,10 @@
    (:require [zaub.core.board :as zboard]
              [zaub.core.unit :as zunit])) 
 
-(def attrs '(:board))
+(def attrs '(:board :col-size :hp :next-unit))
 
-(defn game [brd & args]
-  (zipmap attrs (cons brd args)))
+(defn game [& args]
+  (zipmap attrs args))
 
-(defn do-attacks [game]
-  (let [per-col (map (filter is-ready) (:board game))])
-  )
+(defn alter-board [game col-func]
+  (assoc game :board #(mapv col-func (:board game))))

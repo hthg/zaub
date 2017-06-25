@@ -1,0 +1,17 @@
+* 2p game where players attack each other with units that they insert into a
+  game board.
+
+* Z1
+  As a player
+  I want to insert units into the board
+  in order to be able to attack and block attacks
+
+  * Z1-1
+    As a player
+    I want to be shown what unit is available to insert into my board
+    in order to better plan my strategy
+
+* Z2
+  As a player
+  I want my units to activate and attack
+  in order to damage and beat my opponent.

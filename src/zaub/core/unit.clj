@@ -1,10 +1,10 @@
 (ns zaub.core.unit
    (:require [zaub.core.board :as zboard]))
 
-(def attrs '(:tid :active :ttr :atk))
+(def attrs '(:tid :active :tta :atk :uuid))
 
-(defn unit [id & args]
-  (zipmap attrs (cons id args)))
+(defn unit [& args]
+  (zipmap attrs args))
 
 (defn- activate [unit]
   (assoc unit :active true))
@@ -19,17 +19,20 @@
 (defn activate-col [col]
   (let [activated (map #(assoc % :active true)
                        (select-for-activation col))]
-    (into core/queue (concat activated
+    (into zboard/queue (concat activated
                         (nthrest col (count activated))))))
 
 (defn- tick-unit [u]
   (if (:active u)
-    (assoc u :ttr (dec (:ttr u)))
+    (update u :tta dec)
     u))
 
 (defn tick-col [col]
-  (map tick-unit col))
+  (into zboard/queue (map tick-unit col)))
 
-(defn is-ready [u]
+(defn equals? [{uuid1 :uuid} {uuid2 :uuid}]
+  (= uuid1 uuid2))
+
+(defn ready-to-atk? [u]
   (and (:active u)
-       (= 0 (:ttf u))))
+       (>= 0 (:tta u))))

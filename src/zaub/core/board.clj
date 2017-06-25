@@ -29,12 +29,12 @@
 (defn push-into-random-col [brd elem]
   (push-into-nth brd (rand-int (count brd)) elem))
 
-(defn create-random-board
-  ([brd rand-coll]
+(defn create-randomized-board
+  ([brd-size elems]
    (reduce push-into-random-col
-           brd
-           rand-coll))
-  ([brd rand-coll trans-fn]
+           (create-empty-board brd-size)
+           elems))
+  ([brd-size elems trans-fn]
    (reduce push-into-random-col
-           brd
-           (map trans-fn rand-coll))))
+           (create-empty-board brd-size)
+           (map trans-fn elems))))

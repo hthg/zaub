@@ -6,6 +6,6 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/tools.namespace "0.2.11"]
                  ]
-  :main ^:skip-aot zaub.core
+  :main ^:skip-aot zaub.cli.game
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

@@ -4,9 +4,6 @@
             [clojure.string :as str])
   (:import [java.io BufferedReader]))
 
-(defn- parse-int [n]
-  (Integer/parseInt n))
-
 (defn print-help [opts]
   (println (str/join "\n"
                      (into ["Commands"
@@ -22,28 +19,6 @@
                :new "new game"
                :activate "activate units"
                :quit "quit"})
-
-(def unit-char {:a "a"
-                :b "b"})
-
-(defn- format-unit [unit]
-  (format "%s" (if (some? unit)
-                 (let [id (name (:tid unit))]
-                   (if (:active unit)
-                     (str/upper-case id)
-                     id))
-                 ".")))
-
-(defn pad-col [min-size col]
-  (reverse (take min-size (concat col (repeat nil)))))
-
-(defn pad-board [col-size board]
-  (map (partial pad-col col-size) board))
-
-(defn board-str [{:keys [col-size board]}]
-  (str/join "\n" (map (partial str/join " ")
-                      (map (fn [m] (map format-unit m))
-                           (get-rows (pad-board col-size board))))))
 
 (defmulti handle-cmd (fn [cmd game-info & args] (keyword cmd)))
 
@@ -118,49 +93,3 @@
                  (flush)
                  (rest lines)))
       "Bye")))
-
-(defn random-units [unit-types n-units]
-  (map #(unit % false 3 2)
-       (take n-units (random-sample 0.1 (cycle unit-types)))))
-
-(defn do-ticks [game]
-  (assoc game :board (map tick-col (:board game))))
-
-(defn do-attacks [game]
-  (let [attacking (map (partial filter filter-attacking) (:board game))])
-  game)
-
-(defn do-user-cmd [game]
-  game)
-
-(defn do-activate [game]
-  (assoc game :board (map activate-col (:board game))))
-
-(defn do-turn [game]
-  ((comp do-activate
-         do-user-cmd
-         do-attacks
-         do-ticks) game))
-
-(defn game []
-  (println "Welcome to Zaub!")
-  (println "Type help to view commands")
-  (print "> ")
-  (flush)
-  (loop [game-info (assoc (new-game)
-                          :board (push-random-units (:board (new-game))
-                                                    '("a" "b" "c")
-                                                    5))
-         lines (line-seq (BufferedReader. *in*))]
-    (if (some? game-info)
-      (recur (handle game-info
-                     (first lines))
-             (do (print "> ")
-                 (flush)
-                 (rest lines)))
-      "Bye")))
-
-(defn -main [& args]
-  (case (first args)
-    "sandbox" (sandbox)
-    (game)))
